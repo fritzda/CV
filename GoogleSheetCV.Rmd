@@ -1,0 +1,347 @@
+---
+graphics: yes
+name: Douglas
+surname: Fritz
+pronouns: he/him
+phone: +1 314 941 7182
+position: MD/PhD Student, University of Colorado
+address: Denver, Colorado
+profilepic: /Users/douglasfritz/Git/CV/img/me.jpg
+www: ''
+email: douglasafritz7@gmail.com
+github: douglasfritz
+linkedin: "douglas-fritz"
+orcid: "0000-0001-8822-4639"
+date: "`r format(Sys.time(), '%B %Y')`"
+headcolor: 4F7942
+output: vitae::hyndman
+header-includes:
+  - \definecolor{linkscolor}{HTML}{026dbb}
+  - \usepackage{caption}
+  - \usepackage{hyperref}
+  - \usepackage{colortbl}
+  - \usepackage{hanging}
+  - \arrayrulecolor{white}
+  - \usepackage{changepage}
+  - \hypersetup{colorlinks=true, linkcolor=linkscolor, filecolor=linkscolor, urlcolor=linkscolor, urlbordercolor=linkscolor}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(vitae)
+library(tidyverse)
+library(gsheet)
+library(gt)
+library(flextable)
+```
+
+```{r pretty, include=FALSE}
+baretable <- function(tbl, digits = 0,
+                      include.colnames = FALSE, include.rownames = FALSE,
+                      hline.after = NULL,
+                      size = getOption("xtable.size", NULL),
+                      add.to.row = getOption("xtable.add.to.row", NULL),
+                      longtable = FALSE,
+                      ...) {
+  xtable::xtable(tbl, digits = digits, ...) |>
+    print(
+      include.colnames = include.colnames,
+      include.rownames = include.rownames,
+      hline.after = hline.after,
+      comment = FALSE,
+      tabular.environment = if_else(longtable, "longtable", "tabular"),
+      floating = FALSE,
+      size = size,
+      add.to.row = add.to.row,
+      sanitize.text.function = function(x) {
+        x
+      }
+    )
+}
+
+# Return dollars in pretty manner.
+# Similar to prettyNum but with $ sign and working for numbers greater than 1e7
+dollars <- function(x) {
+  out <- paste0("\\$", sprintf("%.0f", x))
+  paste0(gsub(
+    "^0+\\.", ".",
+    unname(prettyNum(out, ",", preserve.width = "none", scientific = FALSE))
+  ))
+}
+```
+
+
+I am broadly interested in the fields of maternal/fetal health, planetary health, emerging pathogens, AI, infectious disease, virology and immunology. I'm a tinkerer: from latte machines, to laser cutters, to LLMs, I like fixing stuff, building stuff, and making my life better though STEAM.
+
+# Education
+\vspace*{-\baselineskip}
+```{r education}
+#Use the direct link to each sheet, otherwise need sheet id
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1760172285") %>%
+  tidyr::fill(-why) %>%
+  vitae::detailed_entries(what = Degree,
+                          when = Year,
+                          where = Institution, 
+                          with = Location, 
+                          why,
+                          .protect = FALSE) # Setting protect to FALSE allows line breaks
+```
+
+# Professional Appointments
+\vspace*{-\baselineskip}
+```{r work CV}
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1554751840") %>%
+tidyr::fill(-why) %>%
+  vitae::detailed_entries(what = title,
+                          when = date,
+                          where = institution,
+                          why = why,
+                          .protect = F)
+
+```
+
+```{r work resume, eval=FALSE, include=FALSE}
+#Resume Format with bullet points
+#this part doesn't work very well, not currently run
+
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=161085706") %>%
+tidyr::fill() %>%
+  vitae::detailed_entries(what = title,
+                          when = date,
+                          where = institution,
+                          why,
+                          .protect = F) 
+
+```
+
+
+# Selected Publications
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+
+```{r publication, results='asis'}
+rbind(
+  ##Journal Articles Sheet
+    gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=0") %>%
+  #filter(category == "peer-reviewed") %>%
+    select(year, markdown),
+  
+# ##Technical Reports Sheet
+#   gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1473597883") %>%
+#   #Selects the first 3 rows of technical reports
+#   #slice(1:3) %>%
+#   select(year, markdown)
+#   #,
+
+## Preprints Sheet
+  gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1558956454") %>%
+    # Selects the first 3 rows of preprints
+    # slice(1:3) %>%
+    select(year, markdown)
+
+  
+) %>%
+  arrange(-year) %>%
+  select(markdown) %>%
+  mutate(markdown = str_replace_all(markdown, "\\{|\\}", ""),
+         markdown = str_replace_all(markdown, "Fritz, D.", "**Fritz, D.**")) %>%
+  
+# ##The resulting dataset is further sliced to select specific rows using slice.
+    slice(1,2, 3, 5) %>%
+  
+  mutate(markdown = gsub("(https:[^ ]+)", "\\\\url{\\1}", markdown)) %>%
+  pull(markdown) -> intl
+  cat(paste(intl,nsep = " "), sep = '\n\n')
+
+```
+\endgroup
+\leavevmode\newline
+
+# Selected Presentations
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+```{r conference, results='asis'}
+  ##Conference Sheet
+    gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=318960497") %>%
+  filter(year >= "2019") %>% filter(key !="nihasv22") %>%
+    select(year, markdown)%>%
+  arrange(-year) %>%
+  select(markdown) %>%
+  mutate(markdown = str_replace_all(markdown, "\\{|\\}", ""),
+         markdown = str_replace_all(markdown, "Fritz, D.", "**Fritz, D.**")) %>%
+  
+  # slice(1,2, 3, 5) %>%
+  
+  pull(markdown) -> conf
+  cat(paste(conf,nsep = " "), sep = '\n\n')
+
+``` 
+\endgroup
+\leavevmode\newline
+
+# Software
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+```{r software, results='asis'}
+#Software Sheet
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1692561333") %>%
+  select(markdown) %>%
+  mutate(markdown = str_replace_all(markdown, "\\{|\\}", ""),
+         markdown = str_replace_all(markdown, "Fritz, D.", "**Fritz, D.**")) %>%
+  pull(markdown) -> software
+  cat(paste(software), sep = '\n\n')
+
+```
+
+
+\endgroup
+\leavevmode\newline
+
+# Fellowships
+
+  * Physicians for Social Responsibility National's Next Generation Climate & Health Ambassador (2022)
+  * Fulbright Fellow, North Macedonia (2019).
+
+  
+# Grants
+\begingroup
+\vspace*{-\baselineskip}
+```{r grants}
+#Resume Format with bullet points
+
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1320047315") %>%
+tidyr::fill() %>%
+  vitae::detailed_entries(what = award_name,
+                          when = date,
+                          where = organization,
+                          why = details,
+                          .protect = F)
+
+```
+
+# Skills
+\vspace*{-2\baselineskip}
+```{r skills, message=FALSE, warning=FALSE, results='asis'}
+# Skills Sheet
+skills_table <- gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=885656894") %>%
+  mutate(category = ifelse(is.na(category), "", category),
+         details = ifelse(is.na(details), "", details
+         ))
+
+# Render the table using kableExtra
+kableExtra::kbl(skills_table, col.names = NULL, align=c("l","l"), escape = F) %>%
+  kableExtra::column_spec(column = 1, bold = TRUE) %>%
+  kableExtra::row_spec(row = 2, extra_latex_after = "\\arrayrulecolor{white}")
+  
+
+
+```
+\endgroup
+\leavevmode\newline
+  
+# Awards & Honors 
+```{r awards, message=FALSE, warning=FALSE, results='asis'}
+
+# Awards Sheet
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1898241161") %>%
+ filter(year >= "2020") %>%
+    select(year, award_name) %>%
+  arrange(-year) %>% 
+  baretable()
+  
+# # Alternative vitae format like edcuation:
+# gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1898241161") %>%
+#   vitae::detailed_entries(what = award_name,
+#                           when = year,
+#                           where = organization,
+#                           .protect = FALSE) %>% arrange(-year) %>%
+#   filter(when >= "2020")
+
+
+```
+
+
+# Society Memberships
+
+\begingroup
+```{r memberships, results='asis'}
+#results 'asis' is key to making this work with the latex style
+
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1398743395") %>%
+select(organization) %>%
+  pull(organization) -> societies
+  cat(paste(societies,nsep = " "), sep = ", ")
+
+```
+\endgroup
+\leavevmode\newline 
+
+# University Leadership
+\vspace*{-\baselineskip}
+```{r unileadership, results='asis'}
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1205009221") %>%
+ filter(year_ended >= "2021") %>% 
+  filter(type == "university") %>%
+  arrange(desc(year_started), desc(year_ended)) %>%
+brief_entries(
+    what = title,
+    when = date,
+    with = organization
+  )
+```
+
+# Community Leadership
+\vspace*{-\baselineskip}
+```{r comleadership, results='asis'}
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=1205009221") %>%
+ filter(year_ended >= "2021") %>% 
+  filter(type != "university") %>%
+  arrange(desc(year_started), desc(year_ended)) %>%
+brief_entries(
+    what = title,
+    when = date,
+    with = organization
+  )
+```
+# Current Projects
+
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+```{r current projects, results='asis'}
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=527060978") %>%
+tidyr::fill(-date) %>%
+  vitae::detailed_entries(
+                          what = title,
+                          with = institution_with,
+                          where = why,
+                          .protect = F)
+
+
+
+
+```
+\endgroup
+
+
+
+# In The Media
+```{r media, message=FALSE, warning=FALSE, results='asis'}
+
+# Media Sheet
+gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=957986345") %>%
+ filter(year >= "2019" & !type %in% c("Univ. News", "Blog", "Profile", "Trade News", "Video")) %>%
+    select(title, year, details_why_url) %>%
+  arrange(-year) %>% 
+  baretable()
+
+```
+
+# Notes
+
+This CV is reproducible. All the source code behind this CV is available on \href{https://github.com/douglasfritz/CV}{my Github repo}.
