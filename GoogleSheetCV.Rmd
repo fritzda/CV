@@ -3,9 +3,10 @@ graphics: yes
 name: Douglas
 surname: Fritz
 pronouns: he/him
-phone: +1 314 941 7182
-position: MD/PhD Student, University of Colorado
-address: Denver, Colorado
+phone: +44 07933 053400
+# phone: +1 314 941 7182
+position: MD/PhD Student, University of Cambridge/NIH/University of Colorado
+address: Cambridge, UK
 profilepic: /Users/douglasfritz/Git/CV/img/me.jpg
 www: ''
 email: douglasafritz7@gmail.com
@@ -71,7 +72,10 @@ dollars <- function(x) {
 ```
 
 
-I am broadly interested in the fields of maternal/fetal health, planetary health, emerging pathogens, AI, infectious disease, virology and immunology. I'm a tinkerer: from latte machines, to laser cutters, to LLMs, I like fixing stuff, building stuff, and making my life better though STEAM.
+```{r previous bylines, eval = FALSE}
+#I am broadly interested in the fields of maternal/fetal health, planetary health, emerging pathogens, AI, infectious disease, virology and immunology. I'm a tinkerer: from latte machines, to laser cutters, to LLMs, I like fixing stuff, building stuff, and making my life better though STEAM.
+
+```
 
 # Education
 \vspace*{-\baselineskip}
@@ -167,7 +171,7 @@ rbind(
 ```{r conference, results='asis'}
   ##Conference Sheet
     gsheet2tbl("https://docs.google.com/spreadsheets/d/1e9C-H-qXmPScZwefxmjSOm8jpEeYP-c5dVqJIZrHnTQ/edit#gid=318960497") %>%
-  filter(year >= "2019" & organization != "American Society of Virology 2022") %>%
+  filter(year >= "2019" & Include != "N") %>%
     select(year, markdown)%>%
   arrange(-year) %>%
   select(markdown) %>%
